@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -24,5 +25,18 @@ public class FileManagerService {
         Files.copy(file.getInputStream(),savedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         // if the file is present it will replace it
 
+    }
+    public File getFile(String fileName) throws FileNotFoundException {
+        if (null == fileName){
+            throw new IllegalArgumentException("file name is null");
+        }
+        var file = new File(UPLOAD_DIR + File.separator + fileName);
+        if(!Objects.equals(file.getParent(), UPLOAD_DIR)){
+            throw new SecurityException("Unsafe file path");
+        }
+        if (!file.exists()){
+            throw new FileNotFoundException("file not found");
+        }
+        return file;
     }
 }
